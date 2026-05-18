@@ -1,0 +1,1 @@
+/home/obito/.config/omarchy/current/theme/neovim.lua

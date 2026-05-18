@@ -1,0 +1,10 @@
+#!/bin/bash
+clear
+echo -e "\033[32m"
+if [[ -f ~/.config/omarchy/branding/logo.txt ]]; then
+  cat <~/.config/omarchy/branding/logo.txt
+else
+  cat <~/.local/share/omarchy/logo.txt
+fi
+echo -e "\033[0m"
+echo
