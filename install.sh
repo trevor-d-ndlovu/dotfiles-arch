@@ -36,14 +36,13 @@ step1_prereqs() {
   fi
 
   if [[ ! -f /etc/arch-release ]]; then
-    die "Not running Arch Linux (or derivative). Aborting."
+    die "Not running Arch Linux. Aborting."
   fi
 
   if [[ $EUID -eq 0 ]]; then
     die "Do not run this script as root."
   fi
 
-  # Install yay if not present
   if ! command -v yay &>/dev/null; then
     info "Installing yay (AUR helper)..."
     local tmpdir; tmpdir=$(mktemp -d)
@@ -64,22 +63,20 @@ step1_prereqs() {
 # STEP 2 — Install Packages
 # ──────────────────────────────────────────────
 step2_packages() {
-  # Official repo packages
   if [[ -f "$DOTFILES_DIR/packages-repo.txt" ]]; then
     info "Installing official repo packages..."
     sudo pacman -S --needed --noconfirm - < "$DOTFILES_DIR/packages-repo.txt" || {
-      warn "Some packages failed to install. Check the list and retry."
+      warn "Some packages failed. You may need to install them manually."
     }
     ok "Official repo packages installed."
   else
     warn "packages-repo.txt not found — skipping official packages."
   fi
 
-  # AUR packages
   if [[ -f "$DOTFILES_DIR/packages-aur.txt" ]]; then
     info "Installing AUR packages..."
     yay -S --needed --noconfirm - < "$DOTFILES_DIR/packages-aur.txt" || {
-      warn "Some AUR packages failed to install. You may need to install them manually."
+      warn "Some AUR packages failed. You may need to install them manually."
     }
     ok "AUR packages installed."
   else
@@ -88,29 +85,62 @@ step2_packages() {
 }
 
 # ──────────────────────────────────────────────
-# STEP 3 — Omarchy
+# STEP 3 — Deploy Vendored Omarchy Files
 # ──────────────────────────────────────────────
-step3_omarchy() {
-  if command -v omarchy &>/dev/null; then
-    info "Omarchy is already installed."
-    return
+step3_vendor_omarchy() {
+  info "Deploying vendored Omarchy runtime files..."
+
+  local vendor_bin="$DOTFILES_DIR/_vendor/omarchy/bin"
+  local vendor_default="$DOTFILES_DIR/_vendor/omarchy/default"
+  local vendor_apps="$DOTFILES_DIR/_vendor/omarchy/applications"
+  local vendor_config="$DOTFILES_DIR/_vendor/omarchy/config"
+  local vendor_extra="$DOTFILES_DIR/_vendor/omarchy/version"
+
+  local omarchy_path="$HOME/.local/share/omarchy"
+
+  if [[ -d "$vendor_default" ]]; then
+    mkdir -p "$omarchy_path/default"
+    cp -a "$vendor_default/." "$omarchy_path/default/"
+    ok "Default configs deployed to $omarchy_path/default/"
   fi
 
-  info "Installing Omarchy..."
-
-  if [[ -d /usr/share/omarchy ]]; then
-    warn "Omarchy sources found at /usr/share/omarchy but CLI is missing."
-    info "Try: sudo omarchy install"
-    return
+  if [[ -d "$vendor_bin" ]]; then
+    mkdir -p "$omarchy_path/bin"
+    cp -a "$vendor_bin/." "$omarchy_path/bin/"
+    chmod +x "$omarchy_path/bin/omarchy-"* 2>/dev/null || true
+    ok "Omarchy CLI scripts deployed to $omarchy_path/bin/"
   fi
 
-  cat <<'EOF'
-Omarchy is an Arch Linux distribution with Hyprland.
-To install it on bare Arch Linux, visit:
-  https://omarchy.org/install
+  if [[ -d "$vendor_apps" ]]; then
+    mkdir -p "$omarchy_path/applications"
+    cp -a "$vendor_apps/." "$omarchy_path/applications/"
+    ok "Applications deployed."
+  fi
 
-After installing Omarchy, re-run this script to apply configs.
-EOF
+  if [[ -d "$vendor_config" ]]; then
+    mkdir -p "$omarchy_path/config"
+    cp -a "$vendor_config/." "$omarchy_path/config/"
+    ok "Config deployed."
+  fi
+
+  if [[ -f "$vendor_extra" ]]; then
+    cp "$vendor_extra" "$omarchy_path/"
+    ok "Version/branding files deployed."
+  fi
+
+  # Deploy env scripts
+  if [[ -f "$DOTFILES_DIR/.local/bin/env" ]]; then
+    mkdir -p "$HOME/.local/bin"
+    cp "$DOTFILES_DIR/.local/bin/env" "$HOME/.local/bin/env"
+    chmod +x "$HOME/.local/bin/env"
+    ok "env script deployed to ~/.local/bin/"
+  fi
+
+  if [[ -f "$DOTFILES_DIR/.local/bin/env.fish" ]]; then
+    mkdir -p "$HOME/.local/bin"
+    cp "$DOTFILES_DIR/.local/bin/env.fish" "$HOME/.local/bin/env.fish"
+    ok "env.fish script deployed to ~/.local/bin/"
+  fi
 }
 
 # ──────────────────────────────────────────────
@@ -126,7 +156,12 @@ step4_backup() {
     if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
       items+=("$rel")
     fi
-  done < <(find "$DOTFILES_DIR" -not -path '*/.git/*' -not -path '*/.git' -type f -print0)
+  done < <(find "$DOTFILES_DIR" \
+    -not -path '*/.git/*' \
+    -not -path '*/.git' \
+    -not -path '*/_vendor/*' \
+    -not -path '*/_vendor' \
+    -type f -print0)
 
   if [[ ${#items[@]} -eq 0 ]]; then
     ok "No existing configs to back up."
@@ -149,17 +184,15 @@ step4_backup() {
 step5_symlink() {
   info "Symlinking config files..."
 
-  # files to symlink from repo root (e.g., .bashrc, .zshrc, .profile)
+  # files from repo root (e.g., .bashrc, .zshrc, .profile, .XCompose)
   while IFS= read -r -d '' f; do
     local rel="${f#$DOTFILES_DIR/}"
     local target="$HOME/$rel"
 
-    # Skip if it's already pointing to our file
     if [[ -L "$target" ]] && [[ "$(readlink "$target")" == "$f" ]]; then
       continue
     fi
 
-    # Backup existing file/dir
     if [[ -e "$target" ]] || [[ -L "$target" ]]; then
       rm -rf "$target"
     fi
@@ -168,7 +201,7 @@ step5_symlink() {
     ln -sf "$f" "$target"
   done < <(find "$DOTFILES_DIR" -maxdepth 1 -type f -name '.*' -print0)
 
-  # .config directory — symlink each item individually
+  # .config directory — symlink each item
   if [[ -d "$DOTFILES_DIR/.config" ]]; then
     while IFS= read -r -d '' f; do
       local rel="${f#$DOTFILES_DIR/.config/}"
@@ -239,21 +272,25 @@ step6_services() {
 }
 
 # ──────────────────────────────────────────────
-# STEP 7 — Apply Theme & Post-Config
+# STEP 7 — Apply Theme
 # ──────────────────────────────────────────────
 step7_theme() {
-  if command -v omarchy &>/dev/null; then
-    info "Applying Omarchy theme: gruvbox..."
-    omarchy theme set gruvbox 2>/dev/null && ok "Theme applied." || warn "Could not set theme. Try: omarchy theme set gruvbox"
-  else
-    warn "Omarchy not installed — theme files are in place but won't be active until Omarchy is installed."
+  local omarchy_bin="$HOME/.local/share/omarchy/bin"
+  local theme_name="gruvbox"
+
+  if [[ -f "$omarchy_bin/omarchy-theme-set" ]]; then
+    info "Applying theme: $theme_name..."
+    if bash "$omarchy_bin/omarchy-theme-set" "$theme_name" 2>/dev/null; then
+      ok "Theme '$theme_name' applied."
+    else
+      warn "Theme command had issues. Theme files are in place."
+    fi
   fi
 
-  # Apply wallpaper
   if command -v swaybg &>/dev/null; then
-    local wallpaper="$HOME/.config/omarchy/backgrounds/gruvbox/vaga2.png"
-    if [[ -f "$wallpaper" ]]; then
-      info "Wallpaper is symlinked and ready."
+    local wallpaper="$HOME/.config/omarchy/current/background"
+    if [[ -L "$wallpaper" ]] || [[ -f "$wallpaper" ]]; then
+      ok "Wallpaper link is in place."
     fi
   fi
 }
@@ -276,34 +313,34 @@ step8_finish() {
      • Mako                (notifications)
      • Walker              (app launcher)
      • Kitty, Ghostty, Alacritty (terminals)
-     • Omarchy custom      (theme, backgrounds, branding)
+     • Omarchy runtime     (vendored — CLI, defaults, apps)
+     • Gruvbox theme       (applied via vendored omarchy-theme-set)
      • Neovim              (LazyVim config)
      • GTK, fonts, tmux, btop, fastfetch, cava, swayosd
      • Git config, starship prompt, fish shell
 
   ⚡ Post-install tasks:
-     [ ] The Plymouth shutdown theme was customized — if desired, run:
+     [ ] Log out and select "Hyprland (Omarchy)" from SDDM
+     [ ] If Plymouth shutdown screen is desired, run:
            sudo plymouth-set-default-theme omarchy-ascii
-
-     [ ] If you use the Windows VM via Docker, check:
+           sudo mkinitcpio -P
+     [ ] Windows VM via Docker (if needed):
            ~/.config/windows/docker-compose.yml
-
-     [ ] Reboot to pick up all services:
+     [ ] Reboot:
            systemctl reboot
-
-     [ ] If OpenCode is your editor agent, run:
-           opencode init
-
-     [ ] To restore old configs from backup:
+     [ ] Old configs backed up to:
            ~/dotfiles-backup-*
 
-  ⚡ Common keybindings:
+  ⚡ Keybindings:
      Super+Q          Close window
-     Super+Return     Open terminal
+     Super+Return     Terminal
      Super+D          App launcher (walker)
      Super+E          File manager
+     Super+B          Browser
      Super+Space      Switch keyboard layout
      Super+Shift+E    Exit Hyprland
+     Super+Alt+Space  Omarchy menu
+     Super+L          Lock screen
 
 NOTES
 }
@@ -317,13 +354,14 @@ main() {
   if [[ $# -eq 1 && "$1" == "--help" ]]; then
     echo "Usage: ./install.sh"
     echo ""
-    echo "Installs the dotfiles-arch configuration on a fresh Arch Linux system."
+    echo "Installs dotfiles on a fresh Arch Linux system."
     echo "This will:"
     echo "  1. Install all required packages (repo + AUR)"
-    echo "  2. Backup any existing configs"
-    echo "  3. Symlink all dotfiles to ~/"
-    echo "  4. Enable system and user services"
-    echo "  5. Apply the theme"
+    echo "  2. Deploy vendored Omarchy runtime files"
+    echo "  3. Backup any existing configs"
+    echo "  4. Symlink all dotfiles to ~/"
+    echo "  5. Enable system and user services"
+    echo "  6. Apply the theme"
     exit 0
   fi
 
@@ -335,8 +373,8 @@ main() {
   step2_packages
   echo ""
 
-  run_step 3 "Setting up Omarchy..."
-  step3_omarchy
+  run_step 3 "Deploying vendored Omarchy runtime..."
+  step3_vendor_omarchy
   echo ""
 
   run_step 4 "Backing up your existing configs..."
