@@ -12,11 +12,11 @@ fi
 CURRENT_THEME_PATH="$HOME/.config/akatsuki/current/theme"
 NEXT_THEME_PATH="$HOME/.config/akatsuki/current/next-theme"
 USER_THEMES_PATH="$HOME/.config/akatsuki/themes"
-OMARCHY_THEMES_PATH="$AKATSUKI_PATH/themes"
+AKATSUKI_THEMES_PATH="$AKATSUKI_PATH/themes"
 
 THEME_NAME=$(echo "$1" | sed -E 's/<[^>]+>//g' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
 
-if [[ ! -d $OMARCHY_THEMES_PATH/$THEME_NAME ]] && [[ ! -d $USER_THEMES_PATH/$THEME_NAME ]]; then
+if [[ ! -d $AKATSUKI_THEMES_PATH/$THEME_NAME ]] && [[ ! -d $USER_THEMES_PATH/$THEME_NAME ]]; then
   echo "Theme '$THEME_NAME' does not exist"
   exit 1
 fi
@@ -26,7 +26,7 @@ rm -rf "$NEXT_THEME_PATH"
 mkdir -p "$NEXT_THEME_PATH"
 
 # Copy official theme first, then overlay user customizations on top
-cp -r "$OMARCHY_THEMES_PATH/$THEME_NAME/"* "$NEXT_THEME_PATH/" 2>/dev/null
+cp -r "$AKATSUKI_THEMES_PATH/$THEME_NAME/"* "$NEXT_THEME_PATH/" 2>/dev/null
 cp -r "$USER_THEMES_PATH/$THEME_NAME/"* "$NEXT_THEME_PATH/" 2>/dev/null
 
 # Generate colors.toml from alacritty.toml if theme is missing colors.toml
@@ -45,7 +45,7 @@ mv "$NEXT_THEME_PATH" "$CURRENT_THEME_PATH"
 echo "$THEME_NAME" >"$HOME/.config/akatsuki/current/theme.name"
 
 # Change background with theme
-if [[ $OMARCHY_THEME_SKIP_BACKGROUND != "1" ]]; then
+if [[ $AKATSUKI_THEME_SKIP_BACKGROUND != "1" ]]; then
   akatsuki-theme-bg-next
 fi
 

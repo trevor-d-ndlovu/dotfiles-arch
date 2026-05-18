@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-OMARCHY_BIN_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-CLI="$OMARCHY_BIN_DIR/akatsuki"
+AKATSUKI_BIN_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+CLI="$AKATSUKI_BIN_DIR/akatsuki"
 REPEAT=5
 
 show_help() {

@@ -6,7 +6,7 @@
 # akatsuki:examples=akatsuki screenrecord | akatsuki capture screenrecord --with-desktop-audio
 # akatsuki:aliases=akatsuki screenrecord
 #
-# Env: OMARCHY_SCREENRECORD_USE_PORTAL=true skips the built-in slurp picker and
+# Env: AKATSUKI_SCREENRECORD_USE_PORTAL=true skips the built-in slurp picker and
 # uses gpu-screen-recorder's xdg-desktop-portal capture backend instead. The
 # portal backend was originally added (PR #3401) for HDR-aware capture, support
 # for monitors driven by external GPUs, and window capture — enable it if any
@@ -14,12 +14,12 @@
 # DMA-BUF modifier import on some configurations, leaving recording unable to
 # start.
 #
-# Env: OMARCHY_SCREENRECORD_DEBUG=true appends gpu-screen-recorder's stderr (and
+# Env: AKATSUKI_SCREENRECORD_DEBUG=true appends gpu-screen-recorder's stderr (and
 # the picker target it was launched with) to /tmp/akatsuki-screenrecord.log so
 # users can attach a log when reporting capture failures.
 
 [[ -f ~/.config/user-dirs.dirs ]] && source ~/.config/user-dirs.dirs
-OUTPUT_DIR="${OMARCHY_SCREENRECORD_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}}"
+OUTPUT_DIR="${AKATSUKI_SCREENRECORD_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}}"
 
 if [[ ! -d $OUTPUT_DIR ]]; then
   notify-send "Screen recording directory does not exist: $OUTPUT_DIR" -u critical -t 3000
@@ -33,7 +33,7 @@ WEBCAM_DEVICE=""
 RESOLUTION=""
 STOP_RECORDING="false"
 RECORDING_FILE="/tmp/akatsuki-screenrecord-filename"
-LOG_FILE=$([[ ${OMARCHY_SCREENRECORD_DEBUG:-false} == "true" ]] && echo "/tmp/akatsuki-screenrecord.log" || echo "/dev/null")
+LOG_FILE=$([[ ${AKATSUKI_SCREENRECORD_DEBUG:-false} == "true" ]] && echo "/tmp/akatsuki-screenrecord.log" || echo "/dev/null")
 
 for arg in "$@"; do
   case "$arg" in
@@ -167,7 +167,7 @@ start_screenrecording() {
   # the portal backend supports and the kms backend doesn't). Default flow uses
   # slurp + the kms backend, which avoids the EGL DMA-BUF modifier import
   # failures the portal path can hit on some configurations.
-  if [[ ${OMARCHY_SCREENRECORD_USE_PORTAL:-false} == "true" ]]; then
+  if [[ ${AKATSUKI_SCREENRECORD_USE_PORTAL:-false} == "true" ]]; then
     target="portal"
     capture_args=(-w portal -s "${RESOLUTION:-$(default_resolution)}")
   else

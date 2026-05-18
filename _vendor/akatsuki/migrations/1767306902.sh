@@ -1,11 +1,11 @@
 echo "Migrate to new theme setup"
 
 # Move user-added backgrounds from Akatsuki theme folders to user config
-OMARCHY_DIR="$HOME/.local/share/akatsuki"
+AKATSUKI_DIR="$HOME/.local/share/akatsuki"
 USER_BACKGROUNDS_DIR="$HOME/.config/akatsuki/backgrounds"
 
-if [[ -d $OMARCHY_DIR/themes ]]; then
-  cd "$OMARCHY_DIR"
+if [[ -d $AKATSUKI_DIR/themes ]]; then
+  cd "$AKATSUKI_DIR"
 
   # Get list of git-tracked background files (relative to akatsuki dir)
   mapfile -t TRACKED_BACKGROUNDS < <(git ls-files --cached 'themes/*/backgrounds/*' 2>/dev/null)

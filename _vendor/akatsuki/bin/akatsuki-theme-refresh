@@ -5,5 +5,5 @@
 THEME_NAME_PATH="$HOME/.config/akatsuki/current/theme.name"
 
 if [[ -f $THEME_NAME_PATH ]]; then
-  OMARCHY_THEME_SKIP_BACKGROUND=1 akatsuki-theme-set "$(cat $THEME_NAME_PATH)"
+  AKATSUKI_THEME_SKIP_BACKGROUND=1 akatsuki-theme-set "$(cat $THEME_NAME_PATH)"
 fi

@@ -4,7 +4,7 @@ set -euo pipefail
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKUP_DIR="$HOME/dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
 AKATSUKI_PATH="$HOME/.local/share/akatsuki"
-OMARCHY_INSTALL="$AKATSUKI_PATH/install"
+AKATSUKI_INSTALL="$AKATSUKI_PATH/install"
 export PATH="$AKATSUKI_PATH/bin:$PATH"
 
 info()  { printf "\033[1;34m[INFO]\033[0m %s\n" "$*"; }
@@ -18,7 +18,7 @@ run_step() {
 }
 
 run_vendored() {
-  local script="$OMARCHY_INSTALL/$1"
+  local script="$AKATSUKI_INSTALL/$1"
   if [[ -f "$script" ]]; then
     info "  → $1"
     bash "$script" 2>&1 | sed 's/^/    /' || warn "  → $1 had non-fatal issues"

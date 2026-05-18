@@ -6,6 +6,6 @@ tee ~/.XCompose >/dev/null <<EOF
 include "%H/.local/share/akatsuki/default/xcompose"
 
 # Identification
-<Multi_key> <space> <n> : "$OMARCHY_USER_NAME"
-<Multi_key> <space> <e> : "$OMARCHY_USER_EMAIL"
+<Multi_key> <space> <n> : "$AKATSUKI_USER_NAME"
+<Multi_key> <space> <e> : "$AKATSUKI_USER_EMAIL"
 EOF

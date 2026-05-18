@@ -67,9 +67,9 @@ Install entry points (`install.sh`, `boot.sh`) use `#!/bin/bash`. Many scripts u
 Install stage files follow this pattern:
 
 - `install/*/all.sh` lists scripts in execution order
-- leaf scripts are sourced by `run_logged $OMARCHY_INSTALL/path/to/script.sh`
+- leaf scripts are sourced by `run_logged $AKATSUKI_INSTALL/path/to/script.sh`
 - avoid `exit` in sourced install scripts unless intentionally aborting the install
-- use `$OMARCHY_INSTALL` and `$AKATSUKI_PATH` instead of hard-coded Akatsuki paths
+- use `$AKATSUKI_INSTALL` and `$AKATSUKI_PATH` instead of hard-coded Akatsuki paths
 - keep hardware-specific logic under `install/config/hardware/`
 - prefer helper commands for package and command checks where available
 

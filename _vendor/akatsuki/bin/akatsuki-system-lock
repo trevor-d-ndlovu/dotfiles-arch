@@ -23,7 +23,7 @@ fi
 # Avoid running screensaver when locked
 pkill -f org.akatsuki.screensaver
 
-if [[ ${OMARCHY_LOCK_ONLY:-false} != "true" ]]; then
+if [[ ${AKATSUKI_LOCK_ONLY:-false} != "true" ]]; then
   (
     sleep 3
     pidof hyprlock >/dev/null || exit 0
