@@ -14,7 +14,7 @@ source ~/.local/share/akatsuki/default/bash/rc
 . "$HOME/.local/share/../bin/env"
 
 # opencode
-export PATH=/home/obito/.opencode/bin:$PATH
+export PATH="$HOME/.opencode/bin:$PATH"
 
 #pokemon colorscripts
 #pokemon-colorscripts --no-title --small -r 1,3,6
