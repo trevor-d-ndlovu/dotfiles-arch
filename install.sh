@@ -88,59 +88,50 @@ step2_packages() {
 # STEP 3 — Deploy Vendored Omarchy Files
 # ──────────────────────────────────────────────
 step3_vendor_omarchy() {
-  info "Deploying vendored Omarchy runtime files..."
+  info "Deploying vendored Omarchy runtime..."
 
-  local vendor_bin="$DOTFILES_DIR/_vendor/omarchy/bin"
-  local vendor_default="$DOTFILES_DIR/_vendor/omarchy/default"
-  local vendor_apps="$DOTFILES_DIR/_vendor/omarchy/applications"
-  local vendor_config="$DOTFILES_DIR/_vendor/omarchy/config"
-  local vendor_extra="$DOTFILES_DIR/_vendor/omarchy/version"
-
+  local vendor="$DOTFILES_DIR/_vendor/omarchy"
   local omarchy_path="$HOME/.local/share/omarchy"
 
-  if [[ -d "$vendor_default" ]]; then
-    mkdir -p "$omarchy_path/default"
-    cp -a "$vendor_default/." "$omarchy_path/default/"
-    ok "Default configs deployed to $omarchy_path/default/"
-  fi
+  # Deploy each section of the vendored omarchy runtime
+  local dirs=(bin default themes migrations install applications config)
+  for dir in "${dirs[@]}"; do
+    if [[ -d "$vendor/$dir" ]]; then
+      mkdir -p "$omarchy_path/$dir"
+      cp -a "$vendor/$dir/." "$omarchy_path/$dir/"
+    fi
+  done
 
-  if [[ -d "$vendor_bin" ]]; then
-    mkdir -p "$omarchy_path/bin"
-    cp -a "$vendor_bin/." "$omarchy_path/bin/"
-    chmod +x "$omarchy_path/bin/omarchy-"* 2>/dev/null || true
-    ok "Omarchy CLI scripts deployed to $omarchy_path/bin/"
-  fi
+  # Make bin scripts executable
+  chmod +x "$omarchy_path/bin/omarchy-"* 2>/dev/null || true
 
-  if [[ -d "$vendor_apps" ]]; then
-    mkdir -p "$omarchy_path/applications"
-    cp -a "$vendor_apps/." "$omarchy_path/applications/"
-    ok "Applications deployed."
-  fi
+  # Top-level files
+  for f in version icon.png logo.svg icon.txt logo.txt boot.sh install.sh README.md AGENTS.md LICENSE .editorconfig; do
+    [[ -f "$vendor/$f" ]] && cp "$vendor/$f" "$omarchy_path/$f"
+  done
 
-  if [[ -d "$vendor_config" ]]; then
-    mkdir -p "$omarchy_path/config"
-    cp -a "$vendor_config/." "$omarchy_path/config/"
-    ok "Config deployed."
-  fi
+  ok "Omarchy runtime deployed ($(du -sh "$omarchy_path" | cut -f1))"
 
-  if [[ -f "$vendor_extra" ]]; then
-    cp "$vendor_extra" "$omarchy_path/"
-    ok "Version/branding files deployed."
-  fi
-
-  # Deploy env scripts
+  # Deploy PATH env scripts
   if [[ -f "$DOTFILES_DIR/.local/bin/env" ]]; then
     mkdir -p "$HOME/.local/bin"
     cp "$DOTFILES_DIR/.local/bin/env" "$HOME/.local/bin/env"
     chmod +x "$HOME/.local/bin/env"
-    ok "env script deployed to ~/.local/bin/"
+    ok "~/.local/bin/env deployed"
   fi
 
   if [[ -f "$DOTFILES_DIR/.local/bin/env.fish" ]]; then
     mkdir -p "$HOME/.local/bin"
     cp "$DOTFILES_DIR/.local/bin/env.fish" "$HOME/.local/bin/env.fish"
-    ok "env.fish script deployed to ~/.local/bin/"
+    ok "~/.local/bin/env.fish deployed"
   fi
+
+  # Copy local utility scripts
+  for f in "$DOTFILES_DIR/.local/bin/"*; do
+    local name; name=$(basename "$f")
+    [[ "$name" == "env" || "$name" == "env.fish" ]] && continue
+    [[ -f "$f" ]] && cp "$f" "$HOME/.local/bin/$name" && chmod +x "$HOME/.local/bin/$name"
+  done
 }
 
 # ──────────────────────────────────────────────
@@ -278,21 +269,29 @@ step7_theme() {
   local omarchy_bin="$HOME/.local/share/omarchy/bin"
   local theme_name="gruvbox"
 
+  # Ensure OMARCHY_PATH is set for the theme script
+  export OMARCHY_PATH="$HOME/.local/share/omarchy"
+
   if [[ -f "$omarchy_bin/omarchy-theme-set" ]]; then
     info "Applying theme: $theme_name..."
     if bash "$omarchy_bin/omarchy-theme-set" "$theme_name" 2>/dev/null; then
       ok "Theme '$theme_name' applied."
     else
-      warn "Theme command had issues. Theme files are in place."
+      warn "Theme command had minor issues — theme files already in place."
     fi
   fi
 
-  if command -v swaybg &>/dev/null; then
-    local wallpaper="$HOME/.config/omarchy/current/background"
-    if [[ -L "$wallpaper" ]] || [[ -f "$wallpaper" ]]; then
-      ok "Wallpaper link is in place."
-    fi
+  # Make sure the wallpaper symlink exists
+  local bg_link="$HOME/.config/omarchy/current/background"
+  local bg_target="$HOME/.config/omarchy/backgrounds/gruvbox/vaga2.png"
+  if [[ ! -f "$bg_link" ]] && [[ -f "$bg_target" ]]; then
+    mkdir -p "$(dirname "$bg_link")"
+    ln -sf "$bg_target" "$bg_link"
+    ok "Wallpaper symlinked."
   fi
+
+  # Display available themes
+  info "Available themes: $(ls "$OMARCHY_PATH/themes" 2>/dev/null | tr '\n' ' ')"
 }
 
 # ──────────────────────────────────────────────
@@ -307,40 +306,43 @@ step8_finish() {
 
   cat <<'NOTES'
   ⚡ What's installed:
-     • Shell configs       (.bashrc, .zshrc, .profile, .XCompose)
-     • Hyprland WM         (window manager + keybindings + monitors)
-     • Waybar              (status bar)
-     • Mako                (notifications)
-     • Walker              (app launcher)
-     • Kitty, Ghostty, Alacritty (terminals)
-     • Omarchy runtime     (vendored — CLI, defaults, apps)
-     • Gruvbox theme       (applied via vendored omarchy-theme-set)
-     • Neovim              (LazyVim config)
-     • GTK, fonts, tmux, btop, fastfetch, cava, swayosd
-     • Git config, starship prompt, fish shell
+     • Shell               (.bashrc, .zshrc, .profile, .bash_profile, .XCompose, fish/)
+     • Window manager      (Hyprland — keybindings, monitors, input, animations)
+     • Status bar          (Waybar — workspaces, clock, network, audio, battery)
+     • Notifications       (Mako — themed)
+     • App launcher        (Walker — dmenu)
+     • Terminals           (Kitty, Ghostty, Alacritty)
+     • Omarchy runtime     (vendored — 282 CLI scripts, 18 themes, defaults)
+     • Active theme        (gruvbox — with 17 additional themes available)
+     • Editor              (Neovim LazyVim, VS Code settings)
+     • Input method        (Fcitx5 — Chinese/Japanese keyboard)
+     • System              (SDDM, PipeWire, Docker, Bluetooth, CUPS, UFW)
+     • Tools               (GTK, fonts, tmux, btop, fastfetch, cava, swayosd)
+     • Development         (mise, git config, starship, ~/.local/bin utilities)
 
-  ⚡ Post-install tasks:
-     [ ] Log out and select "Hyprland (Omarchy)" from SDDM
-     [ ] If Plymouth shutdown screen is desired, run:
+  ⚡ Post-install:
+     [ ] Log out, select "Hyprland (Omarchy)" from SDDM
+     [ ] If Plymouth shutdown animation is wanted:
            sudo plymouth-set-default-theme omarchy-ascii
            sudo mkinitcpio -P
-     [ ] Windows VM via Docker (if needed):
-           ~/.config/windows/docker-compose.yml
-     [ ] Reboot:
-           systemctl reboot
-     [ ] Old configs backed up to:
-           ~/dotfiles-backup-*
+     [ ] Switch themes anytime: omarchy theme set <name>
+     [ ] Windows VM (Docker): ~/.config/windows/docker-compose.yml
+     [ ] Install missing packages manually if any failed
+     [ ] Reboot: systemctl reboot
+     [ ] Backups in: ~/dotfiles-backup-*
 
   ⚡ Keybindings:
-     Super+Q          Close window
-     Super+Return     Terminal
-     Super+D          App launcher (walker)
-     Super+E          File manager
-     Super+B          Browser
-     Super+Space      Switch keyboard layout
-     Super+Shift+E    Exit Hyprland
-     Super+Alt+Space  Omarchy menu
-     Super+L          Lock screen
+     Super+Return    Terminal        Super+Q        Close window
+     Super+D         Walker          Super+E        File manager
+     Super+B         Browser         Super+N        Neovim
+     Super+L         Lock screen     Super+Shift+E  Exit Hyprland
+     Super+Alt+Space Omarchy menu    Super+Space    Keyboard layout
+
+  ⚡ Available themes:
+     catppuccin  catppuccin-latte  ethereal  everforest  flexoki-light
+     gruvbox     hackerman         kanagawa  lumon       matte-black
+     miasma      nord              osaka-jade  retro-82  ristretto
+     rose-pine   tokyo-night       vantablack  white
 
 NOTES
 }
