@@ -1,3 +1,6 @@
+# Skip Docker config if Docker is not installed
+if ! command -v docker &>/dev/null; then exit 0; fi
+
 # Configure Docker daemon:
 # - limit log size to avoid running out of disk
 # - use host's DNS resolver

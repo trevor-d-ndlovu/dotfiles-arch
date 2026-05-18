@@ -3,7 +3,7 @@ set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKUP_DIR="$HOME/dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
-AKATSUKI_PATH="$HOME/.local/share/akatsuki"
+export AKATSUKI_PATH="$HOME/.local/share/akatsuki"
 AKATSUKI_INSTALL="$AKATSUKI_PATH/install"
 export PATH="$AKATSUKI_PATH/bin:$PATH"
 
@@ -124,6 +124,10 @@ step3_deploy() {
 # ── STEP 4 — System Setup ──
 step4_system_setup() {
   info "Running system configuration..."
+  # Source helpers for chrootable_systemctl_enable (used by bluetooth.sh, printer.sh, etc.)
+  if [[ -f "$AKATSUKI_PATH/install/helpers/chroot.sh" ]]; then
+    source "$AKATSUKI_PATH/install/helpers/chroot.sh"
+  fi
 
   run_vendored "config/docker.sh"
   run_vendored "config/input-group.sh"
@@ -229,7 +233,7 @@ step7_symlink() {
       fi
       mkdir -p "$(dirname "$target")"
       ln -sf "$f" "$target"
-    done < <(find "$DOTFILES_DIR/.config" -print0)
+    done < <(find "$DOTFILES_DIR/.config" -type f -print0)
   fi
 
   ok "Dotfiles symlinked"
