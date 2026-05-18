@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# akatsuki:summary=Install Zed Editor and configure it with the current Akatsuki theme
+
+echo "Installing Zed Editor..."
+akatsuki-pkg-add zed omazed
+
+# Apply Akatsuki theme to Zed
+omazed setup
+
+setsid gtk-launch dev.zed.Zed

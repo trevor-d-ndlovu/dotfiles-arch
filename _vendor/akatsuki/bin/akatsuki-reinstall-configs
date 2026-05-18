@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# akatsuki:summary=Reset all Akatsuki user configs to the defaults
+# akatsuki:requires-sudo=true
+
+set -e
+
+# Overwrite all user configs with the Akatsuki defaults.
+
+if (( EUID == 0 )); then
+  echo "Error: This script should not be run as root"
+  exit 1
+fi
+
+echo "Resetting all Akatsuki configs"
+cp -R ~/.local/share/akatsuki/config/* ~/.config/
+cp ~/.local/share/akatsuki/default/bashrc ~/.bashrc
+echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' | tee ~/.bash_profile >/dev/null
+
+$(bash $AKATSUKI_PATH/install/config/theme.sh)
+
+akatsuki-refresh-limine
+akatsuki-refresh-plymouth
+akatsuki-nvim-setup

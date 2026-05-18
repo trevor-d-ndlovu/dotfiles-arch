@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# akatsuki:summary=No-op now that akatsuki-update-perform is responsible for idle management.
+# akatsuki:hidden=true

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# akatsuki:summary=Reinstall the Akatsuki source directory from git
+
+set -e
+
+# Reinstall the Akatsuki configuration directory from the git source.
+
+git clone --depth=1 --branch master "https://github.com/basecamp/akatsuki.git" ~/.local/share/akatsuki-new >/dev/null
+mv $AKATSUKI_PATH ~/.local/share/akatsuki-old
+mv ~/.local/share/akatsuki-new $AKATSUKI_PATH

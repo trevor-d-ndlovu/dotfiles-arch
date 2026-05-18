@@ -1,10 +1,10 @@
 # If not running interactively, don't do anything (leave this at the top of this file)
 [[ $- != *i* ]] && return
 
-# All the default Omarchy aliases and functions
+# All the default Akatsuki aliases and functions
 # (don't mess with these directly, just overwrite them here!)
-export PATH="$HOME/.config/omarchy/bin:$PATH"
-source ~/.local/share/omarchy/default/bash/rc
+export PATH="$HOME/.config/akatsuki/bin:$PATH"
+source ~/.local/share/akatsuki/default/bash/rc
 
 # Add your own exports, aliases, and functions here.
 #

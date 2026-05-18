@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# akatsuki:summary=Set the correct power profile on boot based on current AC/battery state.
+
+if akatsuki-battery-present && ! akatsuki-ac-present; then
+  akatsuki-powerprofiles-set battery
+else
+  akatsuki-powerprofiles-set ac
+fi

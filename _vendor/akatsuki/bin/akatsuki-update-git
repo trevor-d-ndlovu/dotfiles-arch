@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# akatsuki:summary=Pull the latest Akatsuki git changes
+
+set -e
+
+echo -e "\e[32mUpdate Akatsuki\e[0m"
+
+akatsuki-update-time
+
+# Suppress Hyprland config errors while git updates default config files mid-pull
+hyprctl keyword debug:suppress_errors true &>/dev/null || true
+
+git -C $AKATSUKI_PATH pull --autostash
+git -C $AKATSUKI_PATH --no-pager diff --check || git -C $AKATSUKI_PATH reset --merge
+
+hyprctl reload &>/dev/null || true

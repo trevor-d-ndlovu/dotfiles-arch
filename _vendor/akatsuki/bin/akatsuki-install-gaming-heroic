@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# akatsuki:summary=Install Heroic Games Launcher (Epic, GOG, Amazon Prime Gaming) with graphics drivers.
+# akatsuki:requires-sudo=true
+
+set -e
+
+echo "Installing Heroic Games Launcher..."
+akatsuki-pkg-add heroic-games-launcher-bin
+akatsuki-install-gaming-gpu-lib32
+
+setsid gtk-launch heroic >/dev/null 2>&1 &

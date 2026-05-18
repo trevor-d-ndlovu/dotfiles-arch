@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Reload btop configuration (used by the Akatsuki theme switching).
+
+pkill -SIGUSR2 btop

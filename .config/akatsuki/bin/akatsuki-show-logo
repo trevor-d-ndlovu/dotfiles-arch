@@ -1,0 +1,10 @@
+#!/bin/bash
+clear
+echo -e "\033[32m"
+if [[ -f ~/.config/akatsuki/branding/logo.txt ]]; then
+  cat <~/.config/akatsuki/branding/logo.txt
+else
+  cat <~/.local/share/akatsuki/logo.txt
+fi
+echo -e "\033[0m"
+echo

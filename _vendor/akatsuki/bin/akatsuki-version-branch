@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Print the current Akatsuki git branch
+
+echo $(git -C "$AKATSUKI_PATH" rev-parse --abbrev-ref HEAD)

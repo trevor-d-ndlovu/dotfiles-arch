@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Detect ASUS ExpertBook B9406 series laptops on Intel Panther Lake.
+
+akatsuki-hw-match "B9406" && akatsuki-hw-intel-ptl

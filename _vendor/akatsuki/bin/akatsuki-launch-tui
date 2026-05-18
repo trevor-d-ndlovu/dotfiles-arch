@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# akatsuki:summary=Launch a TUI command in the default terminal with Akatsuki styling
+# akatsuki:args=<command> [args...]
+
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.akatsuki.$(basename $1) -e "$1" "${@:2}"

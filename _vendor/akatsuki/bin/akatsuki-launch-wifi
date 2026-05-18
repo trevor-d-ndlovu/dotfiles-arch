@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# akatsuki:summary=Launch the Akatsuki wifi controls (provided by the Impala TUI).
+
+rfkill unblock wifi
+akatsuki-launch-or-focus-tui impala

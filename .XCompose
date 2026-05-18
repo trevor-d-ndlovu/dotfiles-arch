@@ -1,4 +1,4 @@
-include "%H/.local/share/omarchy/default/xcompose"
+include "%H/.local/share/akatsuki/default/xcompose"
 
 # Identification
 <Multi_key> <space> <n> : ""

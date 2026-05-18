@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Reload mako configuration (used by the Akatsuki theme switching).
+
+makoctl reload

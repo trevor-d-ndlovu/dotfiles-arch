@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# akatsuki:summary=Wake displays and restore brightness after idle
+# akatsuki:group=system
+# akatsuki:name=wake
+# akatsuki:examples=akatsuki system wake
+
+akatsuki-brightness-display on
+akatsuki-brightness-keyboard restore

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Overwrite the user config for fastfetch with the Akatsuki default.
+
+akatsuki-refresh-config fastfetch/config.jsonc

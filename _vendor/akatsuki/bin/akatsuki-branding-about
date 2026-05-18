@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# akatsuki:summary=Edit, set, or reset About branding
+# akatsuki:group=branding
+# akatsuki:name=about
+# akatsuki:args=<image|text|reset>
+# akatsuki:examples=akatsuki branding about image | akatsuki branding about text | akatsuki branding about reset
+
+set -euo pipefail
+
+case "${1:-}" in
+image)
+  image=$(akatsuki-menu-file "Logo image" "$HOME" "svg png")
+  if [[ -n $image ]] && akatsuki-transcode-ascii "$image" ~/.config/akatsuki/branding/about.txt --width 54 --height 26 --mode block; then
+    akatsuki-launch-about >/dev/null 2>&1
+  fi
+  ;;
+text)
+  akatsuki-launch-editor ~/.config/akatsuki/branding/about.txt >/dev/null 2>&1 && akatsuki-launch-about >/dev/null 2>&1
+  ;;
+reset)
+  cp "$AKATSUKI_PATH/icon.txt" ~/.config/akatsuki/branding/about.txt && akatsuki-launch-about >/dev/null 2>&1
+  ;;
+*)
+  echo "Usage: akatsuki-branding-about <image|text|reset>" >&2
+  exit 1
+  ;;
+esac

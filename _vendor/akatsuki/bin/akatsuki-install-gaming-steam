@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# akatsuki:summary=Install Steam and graphics drivers selected for this system
+# akatsuki:requires-sudo=true
+
+set -e
+
+echo "Installing Steam..."
+akatsuki-pkg-add steam
+akatsuki-install-gaming-gpu-lib32
+
+echo ""
+echo "Steam will start automatically now. This might take a while..."
+
+setsid gtk-launch steam >/dev/null 2>&1 &

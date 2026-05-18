@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# akatsuki:summary=Launch a floating terminal with the Akatsuki presentation wrapper
+# akatsuki:args=<command>
+
+cmd="$*"
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.akatsuki.terminal --title=Akatsuki -e bash -c "akatsuki-show-logo; $cmd; if (( \$? != 130 )); then akatsuki-show-done; fi"

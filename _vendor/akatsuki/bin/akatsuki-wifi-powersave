@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# akatsuki:summary=Set Wi-Fi power save mode on wireless interfaces
+# akatsuki:args=<on|off>
+
+for iface in /sys/class/net/*/wireless; do
+  iface="$(basename "$(dirname "$iface")")"
+  iw dev "$iface" set power_save "$1" 2>/dev/null
+done

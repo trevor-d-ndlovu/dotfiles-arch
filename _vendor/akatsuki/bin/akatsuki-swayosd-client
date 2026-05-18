@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# akatsuki:summary=Wrapper for swayosd-client that targets the currently focused monitor.
+# akatsuki:args=<swayosd-client-args...>
+
+exec swayosd-client --monitor "$(akatsuki-hyprland-monitor-focused)" "$@"

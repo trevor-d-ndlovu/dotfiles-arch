@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# akatsuki:summary=Overwrite the user config for the Plymouth drive decryption and boot sequence with the Akatsuki default and rebuild it.
+# akatsuki:requires-sudo=true
+
+sudo cp -r ~/.local/share/akatsuki/default/plymouth/* /usr/share/plymouth/themes/akatsuki/
+sudo plymouth-set-default-theme akatsuki
+
+if command -v limine-mkinitcpio &>/dev/null; then
+  sudo limine-mkinitcpio
+else
+  sudo mkinitcpio -P
+fi

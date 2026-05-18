@@ -1,0 +1,11 @@
+# Changes require a restart to take effect.
+
+# Ensure Akatsuki bins are in the path
+export AKATSUKI_PATH=$HOME/.local/share/akatsuki
+export PATH=$AKATSUKI_PATH/bin:$PATH:$HOME/.local/bin
+
+# Set default terminal and editor
+source ~/.config/uwsm/default
+
+# Activate mise if present on the system
+akatsuki-cmd-present mise && eval "$(mise activate bash --shims)"

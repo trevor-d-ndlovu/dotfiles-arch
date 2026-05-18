@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# akatsuki:summary=Refresh the SDDM theme from default
+# akatsuki:requires-sudo=true
+
+sudo rm -rf /usr/share/sddm/themes/akatsuki
+sudo cp -r $AKATSUKI_PATH/default/sddm/akatsuki /usr/share/sddm/themes/akatsuki

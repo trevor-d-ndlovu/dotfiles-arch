@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# akatsuki:summary=Toggle screensaver availability
+
+akatsuki-toggle \
+  --enabled-notification "󱄄   Screensaver disabled" \
+  --disabled-notification "󱄄   Screensaver enabled" \
+  screensaver-off

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# akatsuki:summary=Display the Akatsuki logo in the terminal using green color.
+
+logo_file=~/.config/akatsuki/branding/logo.txt
+[[ -f $logo_file ]] || logo_file=$AKATSUKI_PATH/logo.txt
+
+clear
+echo -e "\033[32m"
+cat <"$logo_file"
+echo -e "\033[0m"
+echo

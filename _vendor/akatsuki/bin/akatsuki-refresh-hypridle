@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# akatsuki:summary=Overwrite the user config for hypridle with the Akatsuki default and restart the service.
+
+akatsuki-refresh-config hypr/hypridle.conf
+akatsuki-restart-hypridle

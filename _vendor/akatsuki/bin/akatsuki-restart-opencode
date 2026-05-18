@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# akatsuki:summary=Reload opencode configuration (used by the Akatsuki theme switching).
+
+if pgrep -x opencode >/dev/null; then
+  killall -SIGUSR2 opencode
+fi

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Reload hyprland configuration (used by the Akatsuki theme switching).
+
+hyprctl reload >/dev/null

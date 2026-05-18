@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Print the installed Akatsuki version
+
+cat $AKATSUKI_PATH/version

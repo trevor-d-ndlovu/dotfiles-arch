@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Restart the hypridle service (used for idle detection and auto-lock).
+
+akatsuki-restart-app hypridle

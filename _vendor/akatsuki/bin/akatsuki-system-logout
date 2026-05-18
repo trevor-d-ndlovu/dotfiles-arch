@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# akatsuki:summary=Log out after closing application windows
+# akatsuki:examples=akatsuki logout | akatsuki system logout
+# akatsuki:aliases=akatsuki logout
+
+nohup bash -c "sleep 2 && uwsm stop" >/dev/null 2>&1 &
+
+# Now close all windows
+akatsuki-hyprland-window-close-all
+sleep 1 # Allow apps like Chrome to shutdown correctly

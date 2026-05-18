@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# akatsuki:summary=Restore the default Akatsuki Plymouth boot theme and SDDM login screen
+# akatsuki:requires-sudo=true
+
+theme_dir="/usr/share/plymouth/themes/akatsuki"
+
+sudo find ~/.local/share/akatsuki/default/plymouth -maxdepth 1 -type f -exec cp -t "$theme_dir/" {} +
+sudo plymouth-set-default-theme akatsuki
+
+if akatsuki-cmd-present limine-mkinitcpio; then
+  sudo limine-mkinitcpio
+else
+  sudo mkinitcpio -P
+fi
+
+akatsuki-refresh-sddm

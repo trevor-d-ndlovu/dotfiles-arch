@@ -1,0 +1,9 @@
+[Unit]
+Description=Akatsuki Battery Monitor Check
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/share/akatsuki/bin/akatsuki-battery-monitor
+Environment=DISPLAY=:0
+LogLevelMax=warning

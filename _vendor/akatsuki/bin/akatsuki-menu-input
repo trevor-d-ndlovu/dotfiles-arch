@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# akatsuki:summary=Prompt for text input with Walker
+# akatsuki:group=menu
+# akatsuki:name=input
+# akatsuki:args=prompt [walker args...]
+# akatsuki:examples=akatsuki menu input Reminder|akatsuki-menu-input "Reminder in minutes" --width 400
+
+set -euo pipefail
+
+prompt="${1:-Input}"
+if (( $# > 0 )); then
+  shift
+fi
+
+akatsuki-launch-walker --dmenu --inputonly --width 295 --minheight 1 --maxheight 1 -p "$prompt…" "$@" 2>/dev/null

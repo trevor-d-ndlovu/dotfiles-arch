@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# akatsuki:summary=Remove the Xbox Cloud Gaming web app.
+
+set -e
+
+akatsuki-webapp-remove "Xbox Cloud Gaming"

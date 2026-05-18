@@ -1,0 +1,6 @@
+[SddmGreeterTheme]
+Name=Akatsuki
+Description=Minimal terminal-style login theme matching the Limine bootloader aesthetic
+Author=Akatsuki
+Type=sddm-theme
+Version=1.0

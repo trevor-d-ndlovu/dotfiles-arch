@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# akatsuki:summary=Overwrite the user config for hyprsunset with the Akatsuki default and restart the service.
+
+akatsuki-refresh-config hypr/hyprsunset.conf
+akatsuki-restart-hyprsunset

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Detect ASUS Zenbook UX5406AA series laptops on Intel Panther Lake.
+
+akatsuki-hw-match "ux5406aa" && akatsuki-hw-intel-ptl

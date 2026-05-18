@@ -85,32 +85,29 @@ step2_packages() {
 }
 
 # ──────────────────────────────────────────────
-# STEP 3 — Deploy Vendored Omarchy Files
+# STEP 3 — Deploy Vendored Runtime
 # ──────────────────────────────────────────────
-step3_vendor_omarchy() {
-  info "Deploying vendored Omarchy runtime..."
+step3_vendor_runtime() {
+  info "Deploying vendored runtime..."
 
-  local vendor="$DOTFILES_DIR/_vendor/omarchy"
-  local omarchy_path="$HOME/.local/share/omarchy"
+  local vendor="$DOTFILES_DIR/_vendor/akatsuki"
+  local deploy_path="$HOME/.local/share/akatsuki"
 
-  # Deploy each section of the vendored omarchy runtime
   local dirs=(bin default themes migrations install applications config)
   for dir in "${dirs[@]}"; do
     if [[ -d "$vendor/$dir" ]]; then
-      mkdir -p "$omarchy_path/$dir"
-      cp -a "$vendor/$dir/." "$omarchy_path/$dir/"
+      mkdir -p "$deploy_path/$dir"
+      cp -a "$vendor/$dir/." "$deploy_path/$dir/"
     fi
   done
 
-  # Make bin scripts executable
-  chmod +x "$omarchy_path/bin/omarchy-"* 2>/dev/null || true
+  chmod +x "$deploy_path/bin/akatsuki-"* 2>/dev/null || true
 
-  # Top-level files
   for f in version icon.png logo.svg icon.txt logo.txt boot.sh install.sh README.md AGENTS.md LICENSE .editorconfig; do
-    [[ -f "$vendor/$f" ]] && cp "$vendor/$f" "$omarchy_path/$f"
+    [[ -f "$vendor/$f" ]] && cp "$vendor/$f" "$deploy_path/$f"
   done
 
-  ok "Omarchy runtime deployed ($(du -sh "$omarchy_path" | cut -f1))"
+  ok "Akatsuki runtime deployed ($(du -sh "$deploy_path" | cut -f1))"
 
   # Deploy PATH env scripts
   if [[ -f "$DOTFILES_DIR/.local/bin/env" ]]; then
@@ -250,8 +247,8 @@ step6_services() {
     wireplumber.service
     elephant.service
     swayosd-server.service
-    omarchy-recover-internal-monitor.service
-    omarchy-battery-monitor.timer
+    akatsuki-recover-internal-monitor.service
+    akatsuki-battery-monitor.timer
   )
 
   for svc in "${user_services[@]}"; do
@@ -266,15 +263,13 @@ step6_services() {
 # STEP 7 — Apply Theme
 # ──────────────────────────────────────────────
 step7_theme() {
-  local omarchy_bin="$HOME/.local/share/omarchy/bin"
+  local runtime_bin="$HOME/.local/share/akatsuki/bin"
   local theme_name="gruvbox"
+  export AKATSUKI_PATH="$HOME/.local/share/akatsuki"
 
-  # Ensure OMARCHY_PATH is set for the theme script
-  export OMARCHY_PATH="$HOME/.local/share/omarchy"
-
-  if [[ -f "$omarchy_bin/omarchy-theme-set" ]]; then
+  if [[ -f "$runtime_bin/akatsuki-theme-set" ]]; then
     info "Applying theme: $theme_name..."
-    if bash "$omarchy_bin/omarchy-theme-set" "$theme_name" 2>/dev/null; then
+    if bash "$runtime_bin/akatsuki-theme-set" "$theme_name" 2>/dev/null; then
       ok "Theme '$theme_name' applied."
     else
       warn "Theme command had minor issues — theme files already in place."
@@ -282,8 +277,8 @@ step7_theme() {
   fi
 
   # Make sure the wallpaper symlink exists
-  local bg_link="$HOME/.config/omarchy/current/background"
-  local bg_target="$HOME/.config/omarchy/backgrounds/gruvbox/vaga2.png"
+  local bg_link="$HOME/.config/akatsuki/current/background"
+  local bg_target="$HOME/.config/akatsuki/backgrounds/gruvbox/vaga2.png"
   if [[ ! -f "$bg_link" ]] && [[ -f "$bg_target" ]]; then
     mkdir -p "$(dirname "$bg_link")"
     ln -sf "$bg_target" "$bg_link"
@@ -291,7 +286,7 @@ step7_theme() {
   fi
 
   # Display available themes
-  info "Available themes: $(ls "$OMARCHY_PATH/themes" 2>/dev/null | tr '\n' ' ')"
+  info "Available themes: $(ls "$AKATSUKI_PATH/themes" 2>/dev/null | tr '\n' ' ')"
 }
 
 # ──────────────────────────────────────────────
@@ -312,7 +307,7 @@ step8_finish() {
      • Notifications       (Mako — themed)
      • App launcher        (Walker — dmenu)
      • Terminals           (Kitty, Ghostty, Alacritty)
-     • Omarchy runtime     (vendored — 282 CLI scripts, 18 themes, defaults)
+     • Akatsuki runtime    (vendored — 282 CLI scripts, 18 themes, defaults)
      • Active theme        (gruvbox — with 17 additional themes available)
      • Editor              (Neovim LazyVim, VS Code settings)
      • Input method        (Fcitx5 — Chinese/Japanese keyboard)
@@ -321,11 +316,11 @@ step8_finish() {
      • Development         (mise, git config, starship, ~/.local/bin utilities)
 
   ⚡ Post-install:
-     [ ] Log out, select "Hyprland (Omarchy)" from SDDM
+     [ ] Log out, select "Hyprland" from SDDM
      [ ] If Plymouth shutdown animation is wanted:
-           sudo plymouth-set-default-theme omarchy-ascii
+           sudo plymouth-set-default-theme akatsuki
            sudo mkinitcpio -P
-     [ ] Switch themes anytime: omarchy theme set <name>
+     [ ] Switch themes anytime: akatsuki theme set <name>
      [ ] Windows VM (Docker): ~/.config/windows/docker-compose.yml
      [ ] Install missing packages manually if any failed
      [ ] Reboot: systemctl reboot
@@ -336,7 +331,7 @@ step8_finish() {
      Super+D         Walker          Super+E        File manager
      Super+B         Browser         Super+N        Neovim
      Super+L         Lock screen     Super+Shift+E  Exit Hyprland
-     Super+Alt+Space Omarchy menu    Super+Space    Keyboard layout
+     Super+Alt+Space Akatsuki menu   Super+Space    Keyboard layout
 
   ⚡ Available themes:
      catppuccin  catppuccin-latte  ethereal  everforest  flexoki-light
@@ -359,7 +354,7 @@ main() {
     echo "Installs dotfiles on a fresh Arch Linux system."
     echo "This will:"
     echo "  1. Install all required packages (repo + AUR)"
-    echo "  2. Deploy vendored Omarchy runtime files"
+    echo "  2. Deploy vendored Akatsuki runtime files"
     echo "  3. Backup any existing configs"
     echo "  4. Symlink all dotfiles to ~/"
     echo "  5. Enable system and user services"
@@ -375,8 +370,8 @@ main() {
   step2_packages
   echo ""
 
-  run_step 3 "Deploying vendored Omarchy runtime..."
-  step3_vendor_omarchy
+  run_step 3 "Deploying vendored Akatsuki runtime..."
+  step3_vendor_runtime
   echo ""
 
   run_step 4 "Backing up your existing configs..."

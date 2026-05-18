@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# akatsuki:summary=Set the Plymouth boot theme from an Akatsuki theme
+# akatsuki:args=<theme-name>
+# akatsuki:requires-sudo=true
+
+# Resolve a theme by name and apply its unlock.png + colors.toml as the
+# Plymouth boot screen via akatsuki-plymouth-set.
+
+if [[ $# -ne 1 ]]; then
+  echo "Usage: akatsuki-plymouth-set-by-theme <theme-name>" >&2
+  exit 1
+fi
+
+theme=$1
+
+if [[ -d ~/.config/akatsuki/themes/$theme ]]; then
+  theme_dir=~/.config/akatsuki/themes/$theme
+else
+  theme_dir="$AKATSUKI_PATH/themes/$theme"
+fi
+
+bg=$(awk -F'"' '/^background/{print $2}' "$theme_dir/colors.toml")
+text=$(awk -F'"' '/^foreground/{print $2}' "$theme_dir/colors.toml")
+
+exec akatsuki-plymouth-set "$bg" "$text" "$theme_dir/unlock.png"

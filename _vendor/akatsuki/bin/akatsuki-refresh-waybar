@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# akatsuki:summary=Reset Waybar config to Akatsuki defaults
+# akatsuki:examples=akatsuki refresh waybar
+
+akatsuki-refresh-config waybar/config.jsonc
+akatsuki-refresh-config waybar/style.css
+akatsuki-restart-waybar

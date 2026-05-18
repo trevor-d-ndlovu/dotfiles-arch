@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# akatsuki:summary=Launch the Akatsuki audio controls TUI (provided by wiremix).
+
+akatsuki-launch-or-focus-tui wiremix

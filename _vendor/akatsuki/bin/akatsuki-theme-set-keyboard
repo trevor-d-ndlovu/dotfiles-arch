@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# akatsuki:summary=Apply the current theme keyboard color to supported keyboards
+# akatsuki:hidden=true
+
+akatsuki-theme-set-keyboard-asus-rog
+akatsuki-theme-set-keyboard-f16

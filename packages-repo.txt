@@ -185,9 +185,9 @@ noto-fonts-extra
 nss-mdns
 obsidian
 obs-studio
-omarchy-keyring
-omarchy-nvim
-omarchy-walker
+akatsuki-keyring
+akatsuki-nvim
+akatsuki-walker
 openbsd-netcat
 opencode
 pacman-contrib

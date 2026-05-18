@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# akatsuki:summary=Overwrite the user tmux config with the Akatsuki default and reload tmux.
+
+akatsuki-refresh-config tmux/tmux.conf
+akatsuki-restart-tmux
