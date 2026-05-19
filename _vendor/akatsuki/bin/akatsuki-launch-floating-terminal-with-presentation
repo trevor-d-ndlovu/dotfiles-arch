@@ -4,4 +4,4 @@
 # akatsuki:args=<command>
 
 cmd="$*"
-exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.akatsuki.terminal --title=Akatsuki -e bash -c "akatsuki-show-logo; $cmd; if (( \$? != 130 )); then akatsuki-show-done; fi"
+exec setsid uwsm app -- xdg-terminal-exec --app-id=org.akatsuki.terminal --title=Akatsuki -e bash -c "akatsuki-show-logo; $cmd; if (( \$? != 130 )); then akatsuki-show-done; fi"
