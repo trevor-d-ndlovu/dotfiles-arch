@@ -139,6 +139,7 @@ python-poetry-core
 python-protobuf
 qbittorrent
 qt5-wayland
+quickshell
 retroarch
 retroarch-assets-glui
 retroarch-assets-ozone
