@@ -283,9 +283,6 @@ step9_firstrun() {
 step10_theme() {
   local theme_name="gruvbox"
 
-  # Ensure toggles directory exists (Hyprland glob source errors if dir is empty)
-  mkdir -p "$HOME/.local/state/akatsuki/toggles/hypr"
-
   if [[ -f "$AKATSUKI_PATH/bin/akatsuki-theme-set" ]]; then
     info "Applying theme '$theme_name'..."
     bash "$AKATSUKI_PATH/bin/akatsuki-theme-set" "$theme_name" 2>/dev/null || {
